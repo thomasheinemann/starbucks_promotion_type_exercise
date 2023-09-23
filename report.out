@@ -1,0 +1,17 @@
+\BOOKMARK [1][-]{section.1}{Project overview}{}% 1
+\BOOKMARK [1][-]{section*.1}{References}{}% 2
+\BOOKMARK [1][-]{section.2}{Introduction}{}% 3
+\BOOKMARK [1][-]{section.3}{Definitions}{}% 4
+\BOOKMARK [1][-]{section.4}{Modeling approach}{}% 5
+\BOOKMARK [2][-]{subsection.4.1}{Data flow}{section.4}% 6
+\BOOKMARK [2][-]{subsection.4.2}{Step 1: data preparation}{section.4}% 7
+\BOOKMARK [2][-]{subsection.4.3}{Step 2: model 1}{section.4}% 8
+\BOOKMARK [2][-]{subsection.4.4}{Step 3: model 2 \(offer specific model\)}{section.4}% 9
+\BOOKMARK [2][-]{subsection.4.5}{Scoring metric}{section.4}% 10
+\BOOKMARK [1][-]{section.5}{Results}{}% 11
+\BOOKMARK [2][-]{subsection.5.1}{Diagram for the test set}{section.5}% 12
+\BOOKMARK [2][-]{subsection.5.2}{Diagrams with observations for each offer type}{section.5}% 13
+\BOOKMARK [3][-]{subsubsection.5.2.1}{Diagrams for "bogo" offers}{subsection.5.2}% 14
+\BOOKMARK [3][-]{subsubsection.5.2.2}{Diagrams for "discount" offers}{subsection.5.2}% 15
+\BOOKMARK [3][-]{subsubsection.5.2.3}{Diagrams for "informational" offers}{subsection.5.2}% 16
+\BOOKMARK [1][-]{section.6}{Conclusion}{}% 17

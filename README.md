@@ -2,8 +2,8 @@
 
 ### Summary
 This project is a recommendation exercise provided by Starbucks.
-The goal is to investigate customers receptiveness towards a promotion and its type for a product.
-The setup is simplified as there is only one product considered.
+The goal is to investigate customers receptiveness towards various promotions for a product.
+The setup is quite simplified.
 It covers data of customers with their specifics and the information on whether a promotion was sent or not, the type of promotion and if the product was bought afterwards.
 A full description of the problem setting is provided in the main jupyter file.
 
@@ -34,14 +34,23 @@ From their specifics one can learn improve intuition in the marketing campaigns.
 ### Files in the repository
 ```
 .gitignore
+classifier_module.py                   # 
 data
 |-portfolio.json                       # enlists offer data
 |-profile.json                         # enlists demographic data
 |-transcript.json                      # enlists transaction data
-pic1.png                               # pic being included in main jupyter file
-pic2.png                               # pic being included in main jupyter file
+dataflow.pptx                          # pic file in documentation
+dataflow.png                           # pic file in documentation
+pic1.png                               # pic file included in main jupyter file
+pic2.png                               # pic file included in main jupyter file
 README.md
+report.pdf                             # documentation file
+report.tex                             # documentation source file
 requirements.txt                       # list of required packages
 requirements_working_configuration.txt # list of packages covering a working configuration
+results
+|-*.png                                # pic files in documentation
 Starbucks_Capstone_notebook.ipynb      # main jupyter file
+venn_diagram.png                       # pic file used in documentation
+venn_diagram2.png                      # pic file used in documentation
 ```

@@ -6,6 +6,7 @@ The aim is to investigate customer receptivity to different promotions for a pro
 The setup is quite simple.
 It includes data on customers with their details and information on whether a promotion was sent or not, the type of promotion, monetary transactions and whether the offer was subsequently viewed or completed.
 A full description of the setup can be found in the main Jupyter file.
+A documentation of the introduction, technical details and implementation as well as results is provided in the file "report.pdf".
 
 ### Motivation
 This project deals with a simple real-life problem of shops, restaurants or cafés: how to attract the right customers who are willing to pay for the products offered.

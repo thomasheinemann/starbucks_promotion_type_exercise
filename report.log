@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018/W32TeX) (preloaded format=pdflatex 2019.1.8)  26 DEC 2023 16:39
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018/W32TeX) (preloaded format=pdflatex 2019.1.8)  27 DEC 2023 20:29
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -520,76 +520,88 @@ File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 128.
 
-Underfull \hbox (badness 10000) in paragraph at lines 132--138
+Underfull \hbox (badness 10000) in paragraph at lines 133--140
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 143--151
+Overfull \hbox (17.10635pt too wide) in paragraph at lines 145--152
+\OT1/cmr/bx/n/10.95 Offer event times: \OT1/cmr/m/n/10.95 Times of the events a
+bove are fur-ther de-noted as "of-fer[]received[]time", "of-fer[]viewed[]time",
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 151--180
+Underfull \hbox (badness 10000) in paragraph at lines 145--152
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 151--180
+Underfull \hbox (badness 10000) in paragraph at lines 152--181
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 151--180
+Underfull \hbox (badness 10000) in paragraph at lines 152--181
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 151--180
+Overfull \hbox (15.34302pt too wide) in paragraph at lines 152--181
+[] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 152--181
 
  []
 
-<dataflow.png, id=89, 1053.1847pt x 417.05812pt>
+
+Underfull \hbox (badness 10000) in paragraph at lines 152--181
+
+ []
+
+<dataflow.png, id=90, 1053.1847pt x 417.05812pt>
 File: dataflow.png Graphic file (type png)
 <use dataflow.png>
-Package pdftex.def Info: dataflow.png  used on input line 186.
+Package pdftex.def Info: dataflow.png  used on input line 187.
 (pdftex.def)             Requested size: 486.54054pt x 192.66998pt.
 [2]
-Overfull \hbox (10.93257pt too wide) in paragraph at lines 199--202
+Overfull \hbox (10.93257pt too wide) in paragraph at lines 200--205
 \OT1/cmr/m/n/10.95 Model 1 has the task of sim-pli-fy-ing the value sets of the
  cus-tomers' in-te-ger fea-tures "age", "be-come[]member[]on"
  []
 
 
-Overfull \hbox (5.45746pt too wide) in paragraph at lines 199--202
-\OT1/cmr/m/n/10.95 and "in-come" us-ing a trans-former to achieve 10-year-steps
- for the "age", 1-year steps for "be-come[]member[]on"
+Overfull \hbox (1.80748pt too wide) in paragraph at lines 200--205
+\OT1/cmr/m/n/10.95 and "in-come" us-ing a trans-former to achieve 10 year steps
+ for the "age", 1 year steps for "be-come[]member[]on"
  []
 
 [3 <./dataflow.png>]
-<venn_diagram2.png, id=103, 752.8125pt x 341.77687pt>
+<venn_diagram2.png, id=104, 752.8125pt x 341.77687pt>
 File: venn_diagram2.png Graphic file (type png)
 <use venn_diagram2.png>
-Package pdftex.def Info: venn_diagram2.png  used on input line 248.
+Package pdftex.def Info: venn_diagram2.png  used on input line 244.
 (pdftex.def)             Requested size: 358.50314pt x 162.7629pt.
  [4 <./venn_diagram2.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 274--280
+Underfull \hbox (badness 10000) in paragraph at lines 272--278
 
  []
 
 
-LaTeX Font Warning: Command \tiny invalid in math mode on input line 307.
+LaTeX Font Warning: Command \tiny invalid in math mode on input line 305.
 
 
-LaTeX Font Warning: Command \tiny invalid in math mode on input line 307.
+LaTeX Font Warning: Command \tiny invalid in math mode on input line 305.
 
 [5]
-<results/results_test_set.png, id=126, 1091.9997pt x 333.1647pt>
+<results/results_test_set.png, id=128, 1091.9997pt x 333.1647pt>
 File: results/results_test_set.png Graphic file (type png)
 <use results/results_test_set.png>
-Package pdftex.def Info: results/results_test_set.png  used on input line 322.
+Package pdftex.def Info: results/results_test_set.png  used on input line 320.
 (pdftex.def)             Requested size: 512.1496pt x 156.26207pt.
-<results/results1.png, id=127, 1091.9997pt x 802.9197pt>
+<results/results1.png, id=129, 1091.9997pt x 802.9197pt>
 File: results/results1.png Graphic file (type png)
 <use results/results1.png>
 Package pdftex.def Info: results/results1.png  used on input line 336.
@@ -599,7 +611,7 @@ Overfull \hbox (4.45618pt too wide) in paragraph at lines 336--337
 [][] 
  []
 
-<results/results2.png, id=128, 1091.9997pt x 802.9197pt>
+<results/results2.png, id=130, 1091.9997pt x 802.9197pt>
 File: results/results2.png Graphic file (type png)
 <use results/results2.png>
 Package pdftex.def Info: results/results2.png  used on input line 340.
@@ -610,7 +622,7 @@ Overfull \hbox (4.45618pt too wide) in paragraph at lines 340--341
  []
 
 [6 <./results/results_test_set.png>]
-<results/results3.png, id=135, 1091.9997pt x 802.9197pt>
+<results/results3.png, id=137, 1091.9997pt x 802.9197pt>
 File: results/results3.png Graphic file (type png)
 <use results/results3.png>
 Package pdftex.def Info: results/results3.png  used on input line 344.
@@ -621,7 +633,7 @@ Overfull \hbox (4.45618pt too wide) in paragraph at lines 344--345
  []
 
 [7 <./results/results1.png>]
-<results/results4.png, id=144, 1091.9997pt x 802.9197pt>
+<results/results4.png, id=146, 1091.9997pt x 802.9197pt>
 File: results/results4.png Graphic file (type png)
 <use results/results4.png>
 Package pdftex.def Info: results/results4.png  used on input line 348.
@@ -632,7 +644,7 @@ Overfull \hbox (4.45618pt too wide) in paragraph at lines 348--349
  []
 
 [8 <./results/results2.png>] [9 <./results/results3.png>]
-<results/results5.png, id=157, 1091.9997pt x 802.9197pt>
+<results/results5.png, id=159, 1091.9997pt x 802.9197pt>
 File: results/results5.png Graphic file (type png)
 <use results/results5.png>
 Package pdftex.def Info: results/results5.png  used on input line 354.
@@ -642,7 +654,7 @@ Overfull \hbox (4.45618pt too wide) in paragraph at lines 354--355
 [][] 
  []
 
-<results/results6.png, id=158, 1091.9997pt x 802.9197pt>
+<results/results6.png, id=160, 1091.9997pt x 802.9197pt>
 File: results/results6.png Graphic file (type png)
 <use results/results6.png>
 Package pdftex.def Info: results/results6.png  used on input line 358.
@@ -653,7 +665,7 @@ Overfull \hbox (4.45618pt too wide) in paragraph at lines 358--359
  []
 
 [10 <./results/results4.png>]
-<results/results7.png, id=165, 1091.9997pt x 802.9197pt>
+<results/results7.png, id=167, 1091.9997pt x 802.9197pt>
 File: results/results7.png Graphic file (type png)
 <use results/results7.png>
 Package pdftex.def Info: results/results7.png  used on input line 362.
@@ -664,7 +676,7 @@ Overfull \hbox (4.45618pt too wide) in paragraph at lines 362--363
  []
 
 [11 <./results/results5.png>]
-<results/results8.png, id=173, 1091.9997pt x 802.9197pt>
+<results/results8.png, id=175, 1091.9997pt x 802.9197pt>
 File: results/results8.png Graphic file (type png)
 <use results/results8.png>
 Package pdftex.def Info: results/results8.png  used on input line 366.
@@ -675,7 +687,7 @@ Overfull \hbox (4.45618pt too wide) in paragraph at lines 366--367
  []
 
 [12 <./results/results6.png>] [13 <./results/results7.png>]
-<results/results9.png, id=187, 1091.9997pt x 802.9197pt>
+<results/results9.png, id=189, 1091.9997pt x 802.9197pt>
 File: results/results9.png Graphic file (type png)
 <use results/results9.png>
 Package pdftex.def Info: results/results9.png  used on input line 371.
@@ -685,7 +697,7 @@ Overfull \hbox (4.45618pt too wide) in paragraph at lines 371--372
 [][] 
  []
 
-<results/results10.png, id=188, 1091.9997pt x 802.9197pt>
+<results/results10.png, id=190, 1091.9997pt x 802.9197pt>
 File: results/results10.png Graphic file (type png)
 <use results/results10.png>
 Package pdftex.def Info: results/results10.png  used on input line 375.
@@ -696,44 +708,45 @@ Overfull \hbox (4.45618pt too wide) in paragraph at lines 375--376
  []
 
 [14 <./results/results8.png>] [15 <./results/results9.png>]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 394.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 400.
  [16 <./results/results10.png>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 394.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 400.
  (./report.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 394.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 394.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 400.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 400.
 Package rerunfilecheck Info: File `report.out' has not changed.
-(rerunfilecheck)             Checksum: 520E36ED577F4CDE26D9AFB82B41B39C;1120.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 394.
+(rerunfilecheck)             Checksum: 8D76ED9CB43925EF2203571182F0E77C;1146.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 400.
  ) 
 Here is how much of TeX's memory you used:
  8348 strings out of 492616
  125007 string characters out of 6132769
- 235950 words of memory out of 5000000
+ 236955 words of memory out of 5000000
  12100 multiletter control sequences out of 15000+600000
  13317 words of font info for 48 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 44i,18n,43p,558b,364s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 44i,18n,43p,573b,364s stack positions out of 5000i,500n,10000p,200000b,80000s
 <c:/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb><c:/tex
-live/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/texlive/2018
-/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/texlive/2018/texmf-di
-st/fonts/type1/public/amsfonts/cm/cmmi5.pfb><c:/texlive/2018/texmf-dist/fonts/t
-ype1/public/amsfonts/cm/cmmi8.pfb><c:/texlive/2018/texmf-dist/fonts/type1/publi
-c/amsfonts/cm/cmr10.pfb><c:/texlive/2018/texmf-dist/fonts/type1/public/amsfonts
-/cm/cmr12.pfb><c:/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.
-pfb><c:/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb><c:/tex
-live/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb><c:/texlive/2018/t
-exmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb><c:/texlive/2018/texmf-dist/f
-onts/type1/public/amsfonts/cm/cmss10.pfb><c:/texlive/2018/texmf-dist/fonts/type
-1/public/amsfonts/cm/cmss12.pfb><c:/texlive/2018/texmf-dist/fonts/type1/public/
-amsfonts/cm/cmsy10.pfb><c:/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/
-cm/cmsy5.pfb><c:/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.p
-fb><c:/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb><c:/te
-xlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb>
-Output written on report.pdf (16 pages, 1662283 bytes).
+live/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><c:/texlive/2018
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/texlive/2018/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/texlive/2018/texmf-dist/fonts/
+type1/public/amsfonts/cm/cmmi5.pfb><c:/texlive/2018/texmf-dist/fonts/type1/publ
+ic/amsfonts/cm/cmmi8.pfb><c:/texlive/2018/texmf-dist/fonts/type1/public/amsfont
+s/cm/cmr10.pfb><c:/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12
+.pfb><c:/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb><c:/t
+exlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb><c:/texlive/2018
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb><c:/texlive/2018/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmr8.pfb><c:/texlive/2018/texmf-dist/fonts/type
+1/public/amsfonts/cm/cmss10.pfb><c:/texlive/2018/texmf-dist/fonts/type1/public/
+amsfonts/cm/cmss12.pfb><c:/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/
+cm/cmsy10.pfb><c:/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.
+pfb><c:/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb><c:/te
+xlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb><c:/texlive/201
+8/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb>
+Output written on report.pdf (16 pages, 1674457 bytes).
 PDF statistics:
- 279 PDF objects out of 1000 (max. 8388607)
- 215 compressed objects within 3 object streams
+ 284 PDF objects out of 1000 (max. 8388607)
+ 219 compressed objects within 3 object streams
  52 named destinations out of 1000 (max. 500000)
  202 words of extra memory for PDF output out of 10000 (max. 10000000)
 

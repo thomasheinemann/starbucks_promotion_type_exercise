@@ -14,14 +14,14 @@ from sklearn.pipeline import Pipeline
 
 
 
-"""The following transformer acts as a value set simplifyer of a dataframe X carrying information about a customers profile """
+"""The following transformer acts as a value set simplifyer of a dataframe 'X' carrying information about each customer's profile """
 class simplify_feature_values(TransformerMixin):
     def fit(self, X,y=None):
         """fit function (dummy)"""
         return self
 
     def transform(self,X,y=None):
-        """transform function for simplifying the value set of customer profile data contined in dataframe X """
+        """transform function for simplifying the value set of customer profile data contained in dataframe X """
         X_tmp=X.copy()
 
         # simplify became_member_on to its year
@@ -39,48 +39,55 @@ class simplify_feature_values(TransformerMixin):
 
 # the following transformer adds viewing preference attributes - for fitting model "build_viewing_prob_model" is required
 class add_viewing_pref_features(TransformerMixin):
-    def __init__(self, offer_viewing_threshold):
+    def __init__(self, features, offer_viewing_threshold):
         """constructor function"""
         # initialize ML-model for viewing prob. prediction
         self.model=MultiOutputClassifier(LogisticRegression(random_state=0, C=1, max_iter=5000, class_weight="balanced" ))
 
         # call parameter settings procedure
-        self.set_params(offer_viewing_threshold)
+        self.set_params(features, offer_viewing_threshold)
         return None
 
-    def set_params(self,offer_viewing_threshold):
+    def set_params(self,features, offer_viewing_threshold):
         """parameters are set"""
+        self.features=features
         self.offer_viewing_threshold=offer_viewing_threshold
 
         return self
 
     def fit(self, X, y=None):
         """fit function """
-                
-        tmp=X[X.offer_id !="no offer"] # dataframe X but constrained to offers 
+
+        # temorary dataframe 'tmp' = dataframe 'X' but constrained to offers 
+        tmp=X[X.offer_id !="no offer"] 
+
+        # define True-False vectors about information of watching an offer early or late
         viewed_within_certain_time=(tmp["offer_viewed_time"]-tmp["offer_received_time"]<=self.offer_viewing_threshold)
         viewed_after_certain_time=(tmp["offer_viewed_time"]-tmp["offer_received_time"]>self.offer_viewing_threshold)  
 
+        # build target variables for fit
         y=pd.DataFrame()
         y["view_pref"]=viewed_within_certain_time+viewed_after_certain_time
         y["view_pref2"]=viewed_within_certain_time+2*viewed_after_certain_time
         
-        self.model.fit(tmp[["gender_M", "gender_F", "gender_O", "gender_nan", "age", "became_member_on", "income"]],y)# , sample_weight=tmp.duration)
+        # perform fit
+        self.model.fit(tmp[self.features],y)# , sample_weight=tmp.duration)
 
         return self
 
     def transform(self,X,y=None):
-        """ Transform function """
+        """ transform function """
+        # calculate prediction probabilities for "view_pref" and "view_pref2"
+        pred_proba=self.model.predict_proba(X[self.features])
+        
 
-        pred_proba=self.model.predict_proba(X[["gender_M", "gender_F", "gender_O", "gender_nan", "age", "became_member_on", "income"]])
-        viewing_prob=(pred_proba[0].T[1]) 
-
-        X2=pd.DataFrame()  
-        X2["early_viewing_pref"]= (pred_proba[1].T[1]>=pred_proba[1].T[2])  & (viewing_prob>=0.5)  
-        X2["late_viewing_pref"]=  (pred_proba[1].T[1]<pred_proba[1].T[2])  & (viewing_prob>=0.5)   
-        X2["early_viewing_prob"]=pred_proba[1].T[1]
-
-        X2.index=X.index.copy()
+        # build dataframe with viewing preference attributes
+        viewing_prob=(pred_proba[0].T[1]) # probability of viewing an offer
+        X2=pd.DataFrame()                 # initialize temporary dataframe X2
+        X2["early_viewing_pref"]= (pred_proba[1].T[1]>=pred_proba[1].T[2])  & (viewing_prob>=0.5)  # set new attribute "early_viewing_pref"
+        X2["late_viewing_pref"]=  (pred_proba[1].T[1]<pred_proba[1].T[2])  & (viewing_prob>=0.5)   # set new attribute "late_viewing_pref"
+        X2["early_viewing_prob"]=pred_proba[1].T[1]                                                # set new attribute "early_viewing_prob"
+        X2.index=X.index.copy()           # set index same as that of "X" - preparing for concatination
 
         return pd.concat([X,X2], axis=1)
 
@@ -146,7 +153,6 @@ class adjust_completion_feature(TransformerMixin):
             
             # 2. step) adjust "completion" attribute for all no-offer entries w.r.t. the current informational offer
             # right-join all rows for each person covering the considered offer with their no-offer rows to the right
-            # tmp2=pd.merge(X[X.offer_id==offer_id][["person","consumption","duration"]], X[(X.offer_id=="no offer") | (X.offer_id==offer_id+"no offer")], on="person",how="right")
             tmp2=pd.merge(X[X.offer_id==offer_id][["person","consumption","duration"]].groupby(by=["person"]).sum(), X[(X.offer_id=="no offer") | (X.offer_id==offer_id+"no offer")], on="person",how="right")
             A=tmp2[["consumption_x"]]                                                   # grab consumptions column for all data sets of the considered offer type
             B=tmp2[["consumption_y"]]                                                   # grab consumptions column for all data sets of the no offer
@@ -163,8 +169,8 @@ class adjust_completion_feature(TransformerMixin):
 
         # adjust "completion" attribute when non-informational offer types (BOGO and discount) are considered
         else: 
-            duration=24*self.offer_portfolio.duration
-            X.loc[X.offer_id=="no offer","completed"]=np.array(list(map(lambda x : 1 if x==True else 0, (duration+1)*X[X.offer_id=="no offer"]["consumption"].values>difficulty* (X[X.offer_id=="no offer"]["duration"].values)  )))
+            duration=24*self.offer_portfolio.duration+1 # duration of considered offer type; the extra 1 hour takes the edge into account
+            X.loc[X.offer_id=="no offer","completed"]=np.array(list(map(lambda x : 1 if x==True else 0, duration*X[X.offer_id=="no offer"]["consumption"].values>difficulty* (X[X.offer_id=="no offer"]["duration"].values)  )))
         
         # rename "no offer"-offer_id into offer_id=offer_id + "no offer"   -> reason: "no offer"-offer_ids should bear different completion attributes w.r.t. different offer types
         X.loc[X.offer_id=="no offer","offer_id"]=[offer_id + "no offer"]*(X.loc[X.offer_id=="no offer"]).shape[0]
@@ -182,27 +188,24 @@ def starbucks_metrics(df,nir_correction_term):
     irr - incremental response rate (see formular or documentation)
     nir - net incremental reveniew (see formular or documentation)
     """
-    # # calculate irr metric
+    # calculate irr metric
     n_treat       = df.loc[df["promoted"] == 1,:].shape[0]   # number of treated (promoted) customers
     n_control     = df.loc[df["promoted"] == 0,:].shape[0]    # number of non-treated customers
     n_treat_purch = df.loc[df["promoted"] == 1, 'completed'].sum() # number of treated customers who purchased
     n_ctrl_purch  = df.loc[df["promoted"] == 0, 'completed'].sum()  # number of non-treated customers who purchased
     
-    irr = -10000 if (n_treat==0) else 1 if  (n_control==0) else n_treat_purch / n_treat - n_ctrl_purch / n_control # metrics - incremental response rate w.r.t. viewing-(-5 is just a negative default)
+    irr = -10000 if (n_treat==0) else 1 if  (n_control==0) else n_treat_purch / n_treat - n_ctrl_purch / n_control # metrics - incremental response rate w.r.t. viewing
 
 
     # calculate nir metric (shifted version)
     cons_treat_purch=(df.loc[ (df["promoted"] == 1) & (df["completed"] == 1),"consumption"]/df.loc[(df["promoted"] == 1) & (df["completed"] == 1),"duration"]).sum()
     cons_ctrl_purch=(df.loc[ (df["promoted"] == 0) & (df["completed"] == 1),"consumption"]/df.loc[(df["promoted"] == 0) & (df["completed"] == 1),"duration"]).sum()
-    # cons_treat_purch=(df.loc[ (df["completed"] == 1)& (df["promoted"] == 0),"consumption"]/df.loc[(df["completed"] == 1)& (df["promoted"] == 0),"duration"]).sum()
-    # cons_ctrl_purch=(df.loc[(df["completed"] == 0)& (df["promoted"] == 0),"consumption"]/df.loc[(df["completed"] == 0)& (df["promoted"] == 0),"duration"]).sum()
-
     nir=(cons_treat_purch-cons_ctrl_purch)-nir_correction_term*df.shape[0]
 
     return (irr, nir)
     
 def score_prom(X,nir_correction_term):
-    """scoring function - it is a essentially a product of the metrics irr and nir"""   
+    """scoring function called from outside a promotion classifier object - it is a essentially a product of the metrics irr and nir"""   
     
     score_df=X  # consider only those people that would be promoted with our strategy
     
@@ -222,20 +225,18 @@ class promotion_classifier(BaseEstimator):
     def set_params(self,prob_threshold,  estimator, features):
         """parameters are set"""
         self.prob_threshold=prob_threshold
-
         self.estimator = estimator
         self.features=features
 
         return self
         
-    def combine_probabilities_into_output(self,prob1,prob2,prob3,prob4): #,prob5):
+    def combine_probabilities_into_output(self,prob1,prob2,prob3,prob4): 
         """
-        Function aiming to combine three preditor probabilities into one
+        Function aiming to combine four preditor probabilities into one decision to promote the customer or not
         
         INPUT
-        prob1 - probability of event 1
-        prob2 - probability of event 2
-        prob3 - probability of event 3
+        prob1 to prob4 prediction probabilities
+        
         
         OUTPUT
         "YES" or "NO" depending on the combined condition
@@ -251,7 +252,8 @@ class promotion_classifier(BaseEstimator):
     
     def score(self, X, y):
         """scoring function - it is a essentially a product of the metrics irr and nir"""   
-        y_pred=self.predict(X)# [self.features])
+
+        y_pred=self.predict(X)  # calculate  the Yes/No prediction vector resulting from the promotion startegy
         score_df=X.iloc[np.where(y_pred=="Yes")]  # consider only those people that would be promoted with our strategy
 
         irr, nir = starbucks_metrics(score_df,self.nir_correction_term) # calcukate two different metrics
@@ -267,11 +269,7 @@ class promotion_classifier(BaseEstimator):
     def fit(self,X,y=None):
         """fit procedure covering all classifiers for each target"""
 
-        # build subsets among customers profiles depending on their CER states (viewed & completed)
-        # train_data_promoted_buyer=(X[(X.completed==1) & (X.viewed==1)]).copy()        # type I
-        # train_data_sure_buyer=(X[(X.completed==1) & (X.viewed==0) & (X.promoted==1)]).copy()             # type II
-        # train_data_sure_not_buyer=(X[(X.completed==0) & (X.viewed==1)]).copy()          # type III
-        # train_data_unpromoted_not_buyer=(X[(X.completed==0) & (X.viewed==0) & (X.promoted==1)]).copy()    # type IV
+        # build sub training sets for each customer label
         train_data_promoted_buyer=(X[(X.completed==1) & (X.viewed==1)]).copy()        # type I
         train_data_sure_buyer=(X[(X.completed==1) & (X.viewed==0)]).copy()             # type II
         train_data_sure_not_buyer=(X[(X.completed==0) & (X.viewed==1)]).copy()          # type III
@@ -331,21 +329,20 @@ class promotion_classifier(BaseEstimator):
             self.oneclassonly3= False
             self.estimator[2].fit(X_train3,y_train3,sample_weight=temp3.duration)     # fit third estimator
 
-        X2=X# [X.promoted==1]
-        y_pred1,y_pred2,y_pred3=self.predictor_probs(X2)
+        # determine prediction probabilities in the training set
+        y_pred1,y_pred2,y_pred3=self.predictor_probs(X)
+        
+        # determine and save threshold values; these are determined using the reference threshold values decoding the amount of values that have to be exceeded
         self.prob_threshold2=self.prob_threshold
-        
-        
         self.prob_threshold2[0]=np.percentile(y_pred1,self.prob_threshold[0]*100)
         self.prob_threshold2[1]=np.percentile(y_pred2,self.prob_threshold[1]*100)
         self.prob_threshold2[2]=np.percentile(y_pred3,self.prob_threshold[2]*100)
-        self.prob_threshold2[3]=np.percentile(X2.early_viewing_prob.values,self.prob_threshold[3]*100)
+        self.prob_threshold2[3]=np.percentile(X.early_viewing_prob.values,self.prob_threshold[3]*100)
         
+        # determine the shift term in the shifted net incremental revenue; the print argument can be read in the main jupyter file
         fitsize=X.shape[0]
         cons=(X.loc[(X.promoted==1)&(X.completed==1), "consumption"]/X.loc[(X.promoted==1)&(X.completed==1), "duration"]).sum()
         cons_ctrl=(X.loc[(X.promoted==0)&(X.completed==1), "consumption"]/X.loc[(X.promoted==0)&(X.completed==1), "duration"]).sum()
-        # cons=(X.loc[(X.promoted==0)&(X.completed==1), "consumption"]/X.loc[(X.promoted==0)&(X.completed==1), "duration"]).sum()
-        # cons_ctrl=(X.loc[(X.promoted==0)&(X.completed==0), "consumption"]/X.loc[(X.promoted==0)&(X.completed==0), "duration"]).sum()
         self.nir_correction_term=(cons-cons_ctrl)/fitsize
         print("nir_correction_term: ", self.nir_correction_term)
 
@@ -402,8 +399,9 @@ class promotion_classifier(BaseEstimator):
         array of values "Yes" or "No" that determines if each if the person provided will get a promotion according to the strategy we considered
         
         """
+        # calculate prediction probabilities
         y_pred1,y_pred2,y_pred3=self.predictor_probs(X)
         
 
-        return np.array(list(map(self.combine_probabilities_into_output,y_pred1,y_pred2,y_pred3,X.early_viewing_prob.values)))# ,X.viewing_prob.values)))
+        return np.array(list(map(self.combine_probabilities_into_output,y_pred1,y_pred2,y_pred3,X.early_viewing_prob.values)))
         

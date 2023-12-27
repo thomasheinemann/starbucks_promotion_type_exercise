@@ -9,9 +9,9 @@
 \BOOKMARK [2][-]{subsection.4.4}{Step 3: model 2 \(offer specific model\)}{section.4}% 9
 \BOOKMARK [2][-]{subsection.4.5}{Scoring metric}{section.4}% 10
 \BOOKMARK [1][-]{section.5}{Results}{}% 11
-\BOOKMARK [2][-]{subsection.5.1}{Diagram for the test set}{section.5}% 12
-\BOOKMARK [2][-]{subsection.5.2}{Diagrams with observations for each offer type}{section.5}% 13
-\BOOKMARK [3][-]{subsubsection.5.2.1}{Diagrams for "bogo" offers}{subsection.5.2}% 14
-\BOOKMARK [3][-]{subsubsection.5.2.2}{Diagrams for "discount" offers}{subsection.5.2}% 15
-\BOOKMARK [3][-]{subsubsection.5.2.3}{Diagrams for "informational" offers}{subsection.5.2}% 16
+\BOOKMARK [2][-]{subsection.5.1}{Cluster analysis for all customers in the test set}{section.5}% 12
+\BOOKMARK [2][-]{subsection.5.2}{Analyzing the promotion strategy for each offer type}{section.5}% 13
+\BOOKMARK [3][-]{subsubsection.5.2.1}{Diagrams for BOGO offers}{subsection.5.2}% 14
+\BOOKMARK [3][-]{subsubsection.5.2.2}{Diagrams for discount offers}{subsection.5.2}% 15
+\BOOKMARK [3][-]{subsubsection.5.2.3}{Diagrams for informational offers}{subsection.5.2}% 16
 \BOOKMARK [1][-]{section.6}{Conclusion}{}% 17

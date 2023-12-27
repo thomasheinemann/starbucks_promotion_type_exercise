@@ -77,7 +77,7 @@
 
 \section{Project overview}
 
-This is a recommendation engine project proposed by Starbucks to find out which demographic groups of customers respond best to certain types of offers. The underlying datasets include transactional and customer data, as well as information about the types of offers sent. The full set
+This is a recommendation engine project proposed by Starbucks to find out which demographic groups of customers respond best to certain types of offers. The underlying data sets include transactional and customer data, as well as information about the types of offers sent. The full set
 of files, including the main Jupyter file with the detailed task, can be found at \cite{a}.
 In addition, an approach for a simpler version of such a problem can be found here \cite{b}.
 %\cite[1]{rfewf}
@@ -94,7 +94,7 @@ In addition, an approach for a simpler version of such a problem can be found he
 \end{thebibliography}
 
 \section{Introduction}
-To begin with we first present the original introduction and task:
+To begin with we first present the original introduction and task (the full description is here \cite{a}):
 
 
 \begin{quote}
@@ -114,10 +114,10 @@ Keep in mind as well that someone using the app might make a purchase through th
 \end{quote}
 
 So how do we proceed?
-A simple statistical evaluation based on the frequency of offer completions or views per customer may not work, as we do not have huge data sets for each person with and without receiving, viewing and completing a considered offer type. Also, a customer being researched may not have exactly the same profile as those provided.
+A simple statistical evaluation based on the frequency of offer completions or views per customer may not work as we do not have huge data sets for each person with and without receiving, viewing and completing a considered offer type. Also, a customer being researched may not have exactly the same profile as those being provided.
 We therefore improve the statistics by reducing the value set of the customer profile data.
 However, this is not enough, so we train models to predict as accurately as possible whether the customer is worth promoting or not.
-The advantage of this is that these models also make good use of information from other more or less closed customer profiles.
+The advantage of this is that these models also make good use of information from other more or less similar customer profiles.
 
 In the following sections, we provide definitions, present the modelling approach, summarise the results for each type of offer and conclude with our main findings in the conclusion section.
 
@@ -128,39 +128,40 @@ In the following sections, we provide definitions, present the modelling approac
 \item BOGO (buy one get one free) offer: If the customer buys the praised product of this offer then this person gets the same product on top for free.
 \item discount offer: If the customer spends a certain amount then this person receives a discount.
 \item informational offer: These offers just show the customer an advertisement for a product, e.g., a drink. In the given data, however, there is no offer completion record.
+For this purpose, we define an offer instance as "completed" if the hourly spend exceeds that of an no-offer instance, and vice versa.
 \end{itemize}
 \noindent\textbf{Offer instance:} 
 An offer sent for one specific customer, at one specific time (offer\_received\_time). So each offer instance is addressed with the key \textbf{[offer\_id, person, offer\_received\_time]} which is found being unique.
+No-offer times of a customer are treated as "no-offer" offer instances and addressed with [offer\_id="no offer", person, offer\_received\_time=0].
 \\
 \\
 \noindent\textbf{Offer events:} 
 \begin{itemize}
 \item offer received
 \item offer viewed (can also happen after offer is completed or no longer valid)
-\item transaction = the customer makes a transaction of a certain amount 
+\item transaction = the customer makes a transaction of a certain amount (can happen during an offer or a "no-offer" time)
 \item offer completed = the difficulty challenged by the offer has been overcome with the current transaction
 \end{itemize}
 \noindent\textbf{Offer event times:} 
-Times of the offer events above are further denoted as "offer\_received\_time", "offer\_viewed\_time", "transaction\_time", and "offer\_completed\_time".
+Times of the  events above are further denoted as "offer\_received\_time", "offer\_viewed\_time", "transaction\_time", and "offer\_completed\_time".
 \\
 \\
-\textbf{Offer event record (OER): } An OER consists of the offer receiving event, a possible offer viewing event as well as an offer completed event, and all transaction events belonging to one specific offer instance.
-Accordingly like each offer instance, each OER is addressed with the unique key [offer\_id, person, offer\_received\_time].
-For each person we also define one OER related to no-offer times.
-These are addressed as [offer\_id="no offer", person, offer\_received\_time=0].
-Each OER has an offer validation interval starting at its offer\_received\_time and finishes with the $$\mathrm{offer\_time\_out}=\mathrm{offer\_received\_time}+24 \times \mathrm{duration}.$$ 
-The duration marks the maximum offer-specific time interval in days, in which the offer can be valid, if not completed earlier.
+\textbf{Offer event record (OER): }An OER consists of an offer received event, a possible offer viewed or completed event, and all transaction events associated with a specific offer instance.
+Similar to each offer instance, each OER is addressed using the unique key [offer\_id, person, offer\_received\_time].
+For each person we also define one OER associated with no offer times which is addressed with [offer\_id="no offer", person, offer\_received\_time=0].
+Each OER has an offer validation interval starting at its offer\_received\_time and ending at $$\mathrm{offer\_time\_out}=\mathrm{offer\_received\_time}+24 \times \mathrm{duration}.$$ 
+The duration is the maximum offer-specific time interval in days during which the offer can be valid if not completed earlier.
 \\
 \\
 \textbf{States of an offer instance}: 
 \\
-Each offer instance is characterized by the binary state variables "promoted", "viewed" and "completed".
+Each offer instance is characterised by the binary state variables "promoted", "viewed" and "completed".
 Their calculation requires the corresponding OER and is shown in the following table.
 \\
 \\
 \begin{tabular}{|c||c|c|c|c|}
  \hline
-state variables of an offer instance & calculation in terms of logical expressions \\ 
+\textbf{state variables of an offer instance} & \textbf{calculation in terms of logical expressions} \\ 
 \hline
 \hline
 promoted & offer\_id $\ne$ "no offer"\\ 
@@ -175,55 +176,50 @@ completed & $\mathrm{ offer\_completed\_time} \le \mathrm{offer\_time\_out} $ \\
 \\
 \\
 \textbf{Consumption during offer:}
-It is a quantity referring to one OER.
-It is defined as the sum of all transactions done in an OER where each transaction lies in the time interval [offer\_received\_time, offer\_time\_out].
+It is a quantity related to an OER.
+It is defined as the sum of all transactions made in an OER where each transaction lies in the time interval [offer\_received\_time, offer\_time\_out].
 
 
 \section{Modeling approach}
 \subsection{Data flow}
-The data flow along our prediction pipeline starts with the original customer profile attributes and finishes with a decision on whether to promote that person or not. The first step consists in cleaning NaN values and introducing categorical variables for the gender attribute. In the second step, model 1 predicts an early viewing preference used to sort out "lazy viewers".  For predicting the final promotion decision, we used in step 3 the model 2 which is specifically fitted for the each offer type separately.
+The data flow along our prediction pipeline starts with the original customer profile attributes and ends with a decision on whether or not to promote that person. The first step is to get rid of NaN values and introduce categorical variables for the gender attribute. In the second step, model 1 predicts an early viewing probability, which is used to sort out "lazy viewers".  To predict the final decision to send the offer, in step 3 we used model 2, which is fitted separately for each type of offer.
 \begin{figure}[H]
 \includegraphics[width=0.95\textwidth]{dataflow.png}
-\caption{Data flow showing a prediction  pipeline for customer profile attributes  "gender", "age", "became\_member\_on", "income" towards a "yes/no"-prediction for an advertisement campaign. For each offer type a differently fitted version of model 2 is used. The models 1 and 2 have been fitted using customer profile attributes and the customers' offer event records (OERs).}
+\caption{Data flow showing a prediction  pipeline for the customer profile attributes  "gender", "age", "became\_member\_on", "income" to a "yes/no" prediction for an advertisement campaign. For each offer type a differently fitted version of model 2 is used. Models 1 and 2 were fitted using customer profile attributes and customers' offer event records (OERs).}
 \end{figure}
 
 \subsection{Step 1: data preparation}
-The customer profile data is first undergoing a NaN-value treatmet for the income.
-In particular, customers who do not provide an income, are remarked as having an income of -10 k dollar.
-Another issue being treated within this step is the gender attribute which is categorical without order and thus splitted into one-hot-encoded attributes for each class label yielding "gender\_m", "gender\_f", "gender\_o",  and "gender\_nan" (denotes if no gender is provided).
+The customer profile data is first subjected to a NaN-value treatmet for the income.
+In particular, customers who do not report an income, are marked as having an income of -10,000 dollars.
+Another issue treated in this step is the gender attribute which is categorical without order and therefore split into one-hot encoded attributes for each class label, resulting in "gender\_m", "gender\_f", "gender\_o",  and "gender\_nan" (indicating if no gender is provided).
 
 
 
 
 \subsection{Step 2: model 1}
-Model 1 has the task of simplifying the value sets of the customers' integer features "age", "become\_member\_on" and "income" using a transformer to achieve 10-year-steps for the "age", 1-year steps for "become\_member\_on" and 10 k dollar steps for "income".
-Then, in a second transforming process,  a test-set customer yields, within the framework of model 1, a viewing preference encoded in the attribute, "early\_viewing\_prob" (probability for the offer to be viewed within 48 h).
-The underlying model of the second transformer is fitted with all the cleaned customer profile data of the profile training set along with informations of their offer instances' states. The offer instances to be considered comprise only the customers' non-overlaping  ones. This constraint was chosen because multi-offer effects may be quite complex and would constitute a further investigation step probably requiring more data.
+Model 1 has the task of simplifying the value sets of the customers' integer features "age", "become\_member\_on" and "income" using a transformer to achieve 10 year steps for the "age", 1 year steps for "become\_member\_on" and 10,000 dollar steps for "income".
+Then, in a second transformation, a test-set customer receives, within the framework of model 1, an early viewing probability encoded in the attribute, "early\_viewing\_prob" (probability that the offer will be viewed within 48 h).
+This transformer also produces viewing preference information with the self-explanatory attributes "early\_viewing\_pref" and "late\_viewing\_pref"' to predict whether the customer prefers to view within 48 hours, prefers to view after 48 hours or does not tend to view at all.
+These attributes are not used as feature variables in subsequent steps of the pipeline, as they are only predicted from the demographic attributes, but are useful for supporting the visualisation of a customer's demographics in the results section.
+The underlying model of the second transformer is fitted with all the cleaned customer profile data from the profile training set, together with information about their OERs. The offer instances to be considered include only the customers' non-overlapping offer instances. This restriction was chosen because multi-offer effects can be quite complex and would be a further step of investigation that would likely require more data.
 
-
-%\begin{figure}[H]
-%\begin{center}
-%\includegraphics[width=0.4\textwidth]{venn_diagram.png}
-%\caption{\label{fig:venn1}Venn diagram visualizing the task of model 1 which has to perform a prediction whether a customer is one who views an offer or one who does not. }
-%\end{center}
-%\end{figure}
 
 \subsection{Step 3: model 2 (offer specific model)}
 
-In this step, an offer specific model comes into play. Accordingly, for each offer type, a separate instance of this model is used.
-The model itself makes use of cleaned customer profile data and all the customers' OERs of non-overlaping offer instances of the considered offer type and their no-offer OERs.
-The "offer completion" states for the no-offer instances are calculated in this model as if the customer was promoted with the offer type considered in this model.
-To be precisely, a difficulty had to be overcome that scales with the ratio between the no-offer and offer duration.
+In this step, an offer-specific model comes into play. Accordingly, a separate instance of this model is used for each offer type.
+The model itself uses cleansed customer profile data and all the customers' OERs of non-overlapping offer instances of the considered offer type and their corresponding no-offer OERs.
+The "offer completion" states for the no-offer instances are calculated in this model as if the customer had been promoted with the offer type considered in this model.
+To be precise, a difficulty had to be overcome that scales with the ratio between the no-offer and the offer duration.
 
-With respect to states of offer instances, we generally distinct six since an offer can be  sent or not, can be viewed (if promotion exists) or not, and completed or not.
-A grouping of these six classifications into four different labels forms the base of the current model and is shown in the following table.
+Regarding the states of the offer instances, we generally distinguish six since an offer can be  sent or not, can be viewed (if a promotion exists) or not, and completed or not.
+A grouping of these six classifications into four different labels forms the basis of the current model and is shown in the table below.
 
 \begin{center}
 {\Large
 \begin{tabular}{|c||c|c|c|c|}
  \hline
-&\multicolumn{3}{c|}{  states of offer instances}\\
- label & promoted & viewed & completed \\ 
+&\multicolumn{3}{c|}{  \textbf{states of offer instances}}\\
+ \textbf{label} & promoted & viewed & completed \\ 
 \hline
 \hline
 I & yes & yes & yes \\ 
@@ -240,35 +236,37 @@ III & yes & yes & no \\
 }
 \end{center}
 
-The goal of model 2 ist to make use of the upper 4-label classification of ofer instance states to predict customers who complete the offer only if viewed.
-These customers ideally have only offers with states labeled I and IV, respectively. In Fig. \ref{fig:venn2} a Venn diagram is shown that depicts ideal customer sets along with the one we are interested in. We hereby define an ideal customer as one for who the offer completion status solely depends on the viewing status or is even independent of the latter.
-This definition leads to the four different types of ideal customers shown in the figure.
+The aim of Model 2 is to make use of the upper 4-label classification of offer instance states to predict customers who only complete the offer when viewed.
+Ideally, these customers will only have offers with states labelled I and IV, respectively. Fig. \ref{fig:venn2} shows a Venn diagram depicting ideal customer sets along with the one we are interested in. We hereby define an ideal customer as one for whom the offer completion status is solely dependent on the viewing status, or is even independent of the latter.
+This definition leads to the four different types of ideal customers shown in the figure below.
 \begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.7\textwidth]{venn_diagram2.png}
-\caption{\label{fig:venn2}A Venn diagram representing a grouping of ideal customers into four disjunct sets filled with differently colored diagonal stripes is shown. In each set only two distinct offer instance state labels occure (represented by Roman numbers). 
-%  Model 2 is designed to predict people who "complete an offer only if viewed" (black striped area).
+\caption{\label{fig:venn2}A Venn diagram is shown, representing a grouping of ideal customers into four disjunct sets filled with differently colored diagonal stripes. In each set there are only two different offer instance state labels (represented by Roman numbers). 
 }
 \end{center}
 \end{figure}
-Unfortunately, our customers are not ideal, so each customer behaves differently with respect to each singular offer instance.
-We can therefore only predict what behavior the customer is most likely to reveal by assuming a correlation between the customer's profile and their offer instances' states.
 
-In order to determine whether a customer is "completing the offer only if viewed", we create one predictor to distinguish between customer profiles having states with label II vs. those having states with label IV and in analogy a second one to distinguish between I vs. III.
-Using their prediction probabilities for customers with label I as well as label IV states, one can achieve a good estimate for the black-striped area. To do so, the threshold parameters named as $p_1$ and $ p_2$ for both predictors have to be overcome.
+Unfortunately, our customers are not ideal, so each customer will behave differently in relation to each individual offer instance.
+Therefore, the only way we can predict what behaviour the customer is most likely to reveal is by assuming a correlation between the customer's profile and the states of their offer instances.
 
-However, some customers even get repelled from buying when viewing an advertisement (see orange-striped area). These customers are not in the black-striped area but since the border areas are fuzzy we
-further included a third predictor (with threshold parameter $p_3$) distinguishing customer sets with label I $\cup$ IV vs. II $\cup$ III. This allows a seperate tuning of the border between the orange and black-striped area as well as the border between the orange and gray-striped area. In addition, we implemented a fourth threshold parameter $p_4$ for the early viewing probability as determined in model 1, for sorting out lazy viewers in the results set.
-This may prevent having to much customers being unknowingly rewarded.
+In order to determine whether a customer will "complete the offer only if viewed", we create one predictor to distinguish between customer profiles with states labelled II vs. those with states labelled IV, and analogously a second to distinguish between I vs. III.
+Using their prediction probabilities for both label I and label IV customers, we can get a good estimate of the black-striped area. To do this, the threshold parameters $p_1$ and $p_2$ must be exceeded by both prediction probabilities.
 
-The threshold parameters are optimized for each model using a 3-fold cross validation method.
-The scoring metric for the validation sets  as well as the test set, used for each model 2, is defined in the following.
+
+However, some customers are actually discouraged from buying when they see an ad (see orange-striped area). These customers are not in the black-striped area, but since the boundaries are fuzzy, we
+also included a third predictor (with threshold parameter $p_3$) that distinguishes between customer sets with labels I $\cup$ IV vs. II $\cup$ III. This allows separate tuning of the boundary between the orange and black striped area and the boundary between the orange and grey striped area. In addition, we have implemented a fourth threshold parameter $p_4$ for the early viewing probability determined in model 1 to weed out lazy viewers in the result set.
+This can prevent too many customers from being unknowingly rewarded.
+
+The threshold parameters are optimised on a hyperparameter grid for each model 2 instance using a 3-fold cross-validation procedure.
+The scoring metrics for the validation sets and the test set used for every model 2 instance are defined below.
+
 \subsection{Scoring metric}
-The scoring metric was chosen to take two important aspects into account.
-On the one hand we want to maximize the number of customers who complete an offer when receiving it. The underlying metrics to maximize is the "incremental response rate" ("irr").
-On the other hand, we aim at having a gain in consumption by maximizing a shifted version of the "net incremental reveniew" ("nir").
-This prevents our recommendation algorithm to promote too many customers whose reward makes them spend less as they are too satisfied.
-As a scoring  metrics we accordingly used a compromise being a product of both former metrics, i.e.
+The scoring metric was chosen to take into account two important aspects.
+Firstly, we want to maximise the number of customers who complete an offer when they receive it. The underlying metric to be maximised is the "incremental response rate" ("irr").
+On the other hand, we aim to gain consumption by maximising a shifted version of "net incremental revenue" ("nir").
+This prevents our recommendation algorithm from promoting too many customers whose rewards make them spend less because they are too satisfied.
+As a scoring metric, we therefore used a compromise that is a product of the two previous metrics, i.e.
 \begin{align}
 \text{scoring metric}= irr \times nir
 \end{align}
@@ -281,21 +279,21 @@ Both metrics are defined in the following.
 irr=\frac{ n_{prom,compl} }{ n_{prom}} &-\frac{ n_{no\ prom,compl} }{ n_{no\ prom}}
 \\
 \nonumber\\
-n_{prom,compl}:& \text{number of instances of offer type X which are completed}\nonumber
+n_{prom,compl}:& \text{\ number of instances of offer type X which are completed}\nonumber
 \\
-n_{prom}:& \text{number of instances of offer type X}\nonumber
+n_{prom}:& \text{\ number of instances of offer type X}\nonumber
 \\
-n_{no\ prom,compl}:& \text{number of no-offer instances whose consumption rate would have completed}\nonumber
+n_{no\ prom,compl}:& \text{\ number of no-offer instances whose consumption rate would have completed}\nonumber
 \\
 & \text{an offer of offer type X}\nonumber
 \\
-n_{no\ prom}:& \text{number of no-offer instances}\nonumber
+n_{no\ prom}:& \text{\ number of no-offer instances}\nonumber
 \end{align}
 \text{\bf Shifted net incremental  revenew  "nir" (for offer type X):}
-We take the sum of the consumptions of completed offers (of offer type X) minus the sum of consumptions of no-offer instances whose consumption rate would fulfill an offer completion event of offer type X.
-Each consumption is normalized by its correspnding offer/no-offer duration.
+We take the sum of the consumption of completed offers (of offer type X) minus the sum of the consumption of no-offer instances whose consumption rate would satisfy an offer completion event of offer type X.
+Each consumption is normalised by its corresponding offer/no-offer duration. The function of the shift is to take care of the imbalanced data sets of completed offer instances vs. completed no-offer ones.
 \begin{align}
-nir=& \sum_{\substack{i \in \text{ completed offer}\\ \text{instances in}\\ \text{ test set}}} \frac{ \text{consumption(i) }}{ \text{duration(i) }} -   \sum_{\substack{k \in \text{ "completed" } \\ \text{no-offer instances  }\\ \text{in test set}}} \frac{  \text{consumption(k) }}{ \text{ duration(k) }}-\text{shift}\cdot  n_{\text{test}}
+nir=& \sum_{\substack{i \in \text{ "completed" offer}\\ \text{instances in}\\ \text{ test set}}} \frac{ \text{consumption(i) }}{ \text{duration(i) }} -   \sum_{\substack{k \in \text{ "completed" } \\ \text{no-offer instances  }\\ \text{in test set}}} \frac{  \text{consumption(k) }}{ \text{ duration(k) }}-\text{shift}\cdot  n_{\text{test}}
 \\
 \nonumber\\
  \text{consumption }(x):& \text{\ consumption during offer/no-offer instance x}\nonumber\\ 
@@ -313,80 +311,88 @@ nir=& \sum_{\substack{i \in \text{ completed offer}\\ \text{instances in}\\ \tex
 
 
 
-\subsection{Diagram for the test set}
-We present in this susection a cluster analysis among all customers using five histograms covering gender, income, age, membership begin, and viewing preference and thereby stack the bin counts for each cluster on top of each other using different colors. The clusterization has been performed in a five dimensional space spanned by all the former-mentioned demographic attributes represented by one histogram each.
-The optimal number of clusters have been detected using the kmeans++ algorithm with the help of the silhoutte score and is limited hereby to five for simplicity.
+\subsection{Cluster analysis for all customers in the test set}
+In this section we present a cluster analysis of all customers using five histograms covering gender, income, age, membership begin year and viewing preference, with the bin counts for each cluster stacked on top of each other using different colours. Clustering was performed in a five-dimensional space spanned by all of the above demographic attributes, each represented by a histogram.
+The optimal number of clusters was determined using the kmeans++ algorithm with the help of the silhoutte score and is limited here to five for simplicity.
 
 
 \begin{figure}[H]
 \includegraphics[width=1\textwidth]{results/results_test_set.png}
-\caption{Cluster anaylis for all customers in the test set using 5 clusters. With respect to the clusterization, we can recognize that people, who do not provide information about gender, income and age are entirely early viewers. 
-Customers earning more than 70 k are slightly dominated by women. Those earning more than 90 k dollar are not under 40 years old and do not tend to view offers within two days.}
+\caption{Cluster analysis for all customers in the test set using 5 clusters. In terms of clustering, we can see that people who do not provide information on gender, income and age are all early viewers. 
+Customers earning more than \$70,000 are slightly dominated by women. Those earning more than \$90,000 are not under 40 years old and do not tend to view offers within two days.}
 \end{figure}
 
-\subsection{Diagrams with observations for each offer type}
-In this subsection, we briefly analyze for each offer type the customers we recommend for a promotion and also those we do not want to recommend according to the here presented strategy.
-Each figure represents the results of one offer type analysis and consists of three rows of diagrams which cover the demographic information gender, income, age, membership begin, and viewing prefererence.
-The upper row of diagrams displays data of all customers and highlights the customers who should be promoted according to the found strategy.
-The mid row comprises only data of customers to be promoted, whereas the bottom row covers only customers not to be promoted.
-The customers' demographic data in the corresponding histograms have been clustered in the five dimensional space spanned by all the former-mentioned demographic attributes. The clusterization has been performed separately for the  target and not-to-target customers.
-\subsubsection{Diagrams for "bogo" offers}
+\subsection{Analyzing the promotion strategy for each offer type}
+In this subsection we briefly analyse, for each offer type (grouped by main offer types), which customers we would and would not recommend for a promotion using the strategy presented here.
+Each figure represents the results of one offer type analysis and consists of three rows of graphs covering the demographic information of gender, income, age, membership begin year and viewing preference.
+The top row of graphs shows data for all customers and highlights the customers who should be promoted according to the strategy found.
+The middle row contains data only for customers to be promoted, while the bottom row contains data only for customers not to be promoted.
+The customer demographics in the corresponding histograms have been clustered in the five-dimensional space spanned by all the aforementioned demographic attributes. Clustering was performed separately for target and non-target customers. In each analysis, the values for the "irr" and "nir" metrics, the threshold parameters of model 2 ($p_1, p_2, p_3, p_4$), as well as the metric score and the target (non-target) to test set ratio or 'coverage' of all test set customers are shown.
+The values for the threshold parameters shown in this investigation, each multiplied by 100, refer to the percentile of the corresponding prediction probability values determined in the training set.
+The following hyperparameter grid was used for optimizing $p_1,\dots, p_4$: $p_1,\dots, p_3 \in (0, 0.25, 0.5, 0.75, 1)$ and for $p_4 \in (0,0.1,\dots,0.9)$.
+\subsubsection{Diagrams for BOGO offers}
 
 \begin{figure}[H]
 \includegraphics[height=0.5\textheight]{results/results1.png}
-\caption{Customers with  incomes up to 70 k dollars are worth being addressed by this offer. Those who do not provide demographic information should be included as well. The considered customers tend to view early or rather not. }
+\caption{Customers with  incomes up to \$70,000 are worth targeting with this offer.  Those who do not provide demographic information should be included as well. The considered customers tend to view early or rather not. }
 \end{figure}
 \begin{figure}[H]
 \includegraphics[height=0.5\textheight]{results/results2.png}
-\caption{Customers with  incomes up to 60 k dollars are worth being addressed by this offer. Those who do not provide demographic information should be included as well.}
+\caption{Customers with  incomes up to \$60,000 are worth targeting with this offer.  Those who do not provide demographic information should be included as well. The considered customers tend to view early or rather not. }
 \end{figure}
 \begin{figure}[H]
 \includegraphics[height=0.5\textheight]{results/results3.png}
-\caption{Customers with  incomes up to 70 k dollars are worth being addressed by this offer. Those who do not provide demographic information should be included as well. }
+\caption{Customers worth targeting with this offer are basically the same as in offer type 1. However, this offer type has a weaker value in the metric score.}
 \end{figure}
 \begin{figure}[H]
 \includegraphics[height=0.5\textheight]{results/results4.png}
-\caption{Customers with  incomes up to 60 k dollars are worth being addressed by this offer. Those who do not provide demographic information should be included as well. }
+\caption{Customers worth targeting with this offer are basically the same as in offer type 2. However, this offer type has a stronger value in the metric score.}
 \end{figure}
-\subsubsection{Diagrams for "discount" offers}
+\subsubsection{Diagrams for discount offers}
 
 \begin{figure}[H]
 \includegraphics[height=0.5\textheight]{results/results5.png}
-\caption{Customers with  incomes up to 80 k dollars are worth being addressed by this offer. Those who do not provide demographic information should be included as well.}
+\caption{Customers with  incomes up to \$80,000 are worth targeting with this offer. Those who do not provide demographic information should be included as well.}
 \end{figure}
 \begin{figure}[H]
 \includegraphics[height=0.5\textheight]{results/results6.png}
-\caption{Customers with  incomes up to 60 k dollars are worth being addressed by this offer. Those who do not provide demographic information should be included as well.}
+\caption{Customers worth targeting with this offer are basically the same as in offer type 2 or 4.}
 \end{figure}
 \begin{figure}[H]
 \includegraphics[height=0.5\textheight]{results/results7.png}
-\caption{Customers to be addressed are basically the same as in offer type 6. Howeer, this offer type has a stronger value in the metric score.}
+\caption{Customers worth targeting with this offer are basically the same as in offer type 2,4 or 6. However, this offer type has a stronger value in the metric score.}
 \end{figure}
 \begin{figure}[H]
 \includegraphics[height=0.5\textheight]{results/results8.png}
-\caption{Customers to be addressed are basically the same as in offer type 6. Howeer, this offer type has a weak value in the scoring metric. }
+\caption{Customers worth targeting with this offer are basically the same as in offer type 2,4, 6 or 7.}
 \end{figure}
-\subsubsection{Diagrams for "informational" offers}
+\subsubsection{Diagrams for informational offers}
 \begin{figure}[H]
 \includegraphics[height=0.5\textheight]{results/results9.png}
-\caption{All customers earning at least 60 k dollars should be adressed by this offer. These customers tend to view lately or rather not. Customers not providing demographic information should be excluded.}
+\caption{A majority of customers earning at least \$70,000 should be targeted by this offer. These customers are more likely female and tend to view lately or rather not. Customers not providing demographic information should be excluded.}
 \end{figure}
 \begin{figure}[H]
 \includegraphics[height=0.5\textheight]{results/results10.png}
-\caption{Primarily young and mid-aged customers are worth being addressed by this offer. These customers tend to view lately or rather not. Customers not providing demographic information should be excluded. From those earning 70 k dollars or less, only those who tend to view lately are within the target group.}
+\caption{A staggering $75\%$ of customers are worth targeting with this offer, with the highest metric score found. Young and middle-aged customers are particularly worth targets. These customers are more likely to view lately or rather not. Customers who do not provide demographic information should be excluded. Of those with an income of \$60,000 or less, only those who tend to view lately are in the target group.}
 \end{figure}
 
 
 \section{Conclusion}
-BOGO and discount offers are primarily suitable for low and mid-income customers. The best BOGO offer is offer type No. 4 and designed for customers earning up to 60 k dollar.
-It has a  5-day vailidity period and a 5 dollar difficulty to overcome. 
-The best discount offer is offer type No. 7 possessing a 7-day vailidity period, a 10 dollar difficulty and a 2 dollar reward.
-Also this offer type is designed for customers earning up to 60 k dollar but has a metric score being twice compared to the best BOGO one.
-Nonetheless, both money-saving offers, BOGO and discount, seem not designed for customers in the higher income region.
-With respect to the informational offers, however,  we can recognize that these are primarily suitable for customers who earn a lot and do not tend to view offers immediately.
-Customers who do not provide demographic information are, contrary to the other offer types, not included in the target group.
-It might be that people who do not provide information about themselves whish not to be informed by the app without having a direct benefit.
-There might be also a tendency that addressing offers through social networks may increase the metric score.
+In this study, we can conclude that BOGO and discount offers are primarily targeted at low- and middle-income customers. The best BOGO offer is offer type No. 4 and is designed for customers earning up to \$60,000.
+It has a 5-day validity period and a \$5 threshold. 
+The best discount offer is offer type No.~7, which has a 7-day validity period, a \$10 difficulty level and a \$2 reward.
+Offer type No.~4 is also designed for customers earning up to \$60,000, but has a metric score that is twice as high as the best BOGO offer.
+Nonetheless, both the BOGO and discount offers do not target higher income customers.
+On the other hand, we can see that the information offers are intended for high income customers who do not tend to look at offers immediately.
+In contrast to the other types of offers, customers who do not provide demographic information are not included in the target group.
+It may be that people who do not provide any information about themselves do not want to be informed by the app without any direct benefit.
+In fact, the second information offer (offer type No.~10) with the 3 day duration has even the highest metric score of all offers and a coverage of $75\%$.
+This seems to be the best choice of offer to send for most customers who provide demographic information.
+The remaining customers should receive offer No.~5 or 7 depending on their demographics.
+However, it is difficult to make an exact decision within the scope of this research, as a finer screening of the parameters and more data would probably provide more clarity.
+With regard to the choice of demographic attributes for a possible promotion decision, we can say that the starting date of membership does not seem to be very characteristic, at least when looking at the year.
+However, the impact of the "income" attribute, as well as the decision to provide demographic data at all, seems to be very profound in this context.
+There may also be a tendency for targeting via social networks to increase the metric score.
 
 
 

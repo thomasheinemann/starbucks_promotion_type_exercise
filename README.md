@@ -12,7 +12,14 @@ A documentation of the introduction, technical details and implementation as wel
 This project deals with a simple real-life problem of shops, restaurants or cafés: how to attract the right customers who are willing to pay for the products offered.
 From its peculiarities, one can learn to improve intuition in marketing campaigns.
 
-### Data sources: 
+### Data sources 
+The following Json files constitute as data source:
+- portfolio.json                       # enlists offer data
+- profile.json                         # enlists demographic data
+- transcript.json                      # enlists transaction data
+
+### Acknowledgements 
+The used data stems from the company "Starbucks" and represents data of a simplified version of the real Starbucks app because the underlying simulator only has one product whereas Starbucks actually sells dozens of products. The data was provided through the company "udacity" in the framework of a data science online course.
 
 ### Install/run instructions:
 1. Install python >= 3.11 and the packages denoted in requirements_working_configuration.txt preferably in a virtual environment as exemplarily shown for the windows command prompt:
@@ -35,13 +42,15 @@ From its peculiarities, one can learn to improve intuition in marketing campaign
 ### Files in the repository
 ```
 .gitignore
-classifier_module.py                   # 
+classifier_module.py                   # python module used in main Jupyter file
 data
 |-portfolio.json                       # enlists offer data
 |-profile.json                         # enlists demographic data
 |-transcript.json                      # enlists transaction data
 dataflow.pptx                          # pic file in documentation
 dataflow.png                           # pic file in documentation
+pics
+|-*.png                                # picture files used in the documentation
 pic1.png                               # pic file included in main jupyter file
 pic2.png                               # pic file included in main jupyter file
 README.md

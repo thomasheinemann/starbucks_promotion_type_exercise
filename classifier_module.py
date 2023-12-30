@@ -58,7 +58,7 @@ class add_viewing_pref_features(TransformerMixin):
     def fit(self, X, y=None):
         """fit function """
 
-        # temorary dataframe 'tmp' = dataframe 'X' but constrained to offers 
+        # temporary dataframe 'tmp' = dataframe 'X' but constrained to offers 
         tmp=X[X.offer_id !="no offer"] 
 
         # define True-False vectors about information of watching an offer early or late
@@ -77,7 +77,7 @@ class add_viewing_pref_features(TransformerMixin):
 
     def transform(self,X,y=None):
         """ transform function """
-        # calculate prediction probabilities for "view_pref" and "view_pref2"
+        # calculate viewing prwferences "early_viewing_pref" and "late_viewing_pref" and "early_viewing_prob"
         pred_proba=self.model.predict_proba(X[self.features])
         
 

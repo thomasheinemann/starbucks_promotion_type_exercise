@@ -33,7 +33,7 @@
 %%% PACKAGES
 \usepackage{booktabs} % for much better looking tables
 \usepackage{array} % for better arrays (eg matrices) in maths
-\usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
+\usepackage{paralist} % very flexible & customizable lists (eg. enumerate/itemize, etc.)
 \usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
 \usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
 % These packages are all incorporated in the memoir class to one degree or another...
@@ -41,7 +41,7 @@
 %%% HEADERS & FOOTERS
 \usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
 \pagestyle{fancy} % options: empty , plain , fancy
-\renewcommand{\headrulewidth}{0pt} % customise the layout...
+\renewcommand{\headrulewidth}{0pt} % customize the layout...
 \lhead{}\chead{}\rhead{}
 \lfoot{}\cfoot{\thepage}\rfoot{}
 
@@ -119,7 +119,7 @@ We therefore improve the statistics by reducing the value set of the customer pr
 However, this is not enough, so we train models to predict as accurately as possible whether the customer is worth promoting or not.
 The advantage of this is that these models also make good use of information from other more or less similar customer profiles.
 
-In the following sections, we provide definitions, present the modelling approach, summarise the results for each type of offer and conclude with our main findings in the conclusion section.
+In the following sections, we provide definitions, present the modeling approach and its implementation, summarize the results for each type of offer, conclude with our main findings in the conclusion section and finally provide an outlook with a discussion on how to improve the current survey.
 
 
 \section{Definitions}
@@ -155,7 +155,7 @@ The duration is the maximum offer-specific time interval in days during which th
 \\
 \textbf{States of an offer instance}: 
 \\
-Each offer instance is characterised by the binary state variables "promoted", "viewed" and "completed".
+Each offer instance is characterized by the binary state variables "promoted", "viewed" and "completed".
 Their calculation requires the corresponding OER and is shown in the following table.
 \\
 \\
@@ -181,33 +181,35 @@ It is defined as the sum of all transactions made in an OER where each transacti
 
 
 \section{Modeling approach}
-\subsection{Data flow}
-The data flow along our prediction pipeline starts with the original customer profile attributes and ends with a decision on whether or not to promote that person. The first step is to get rid of NaN values and introduce categorical variables for the gender attribute. In the second step, model 1 predicts an early viewing probability, which is used to sort out "lazy viewers".  To predict the final decision to send the offer, in step 3 we used model 2, which is fitted separately for each type of offer.
+\subsection{Data flow for new customers}
+The data flow along our prediction pipeline starts with the original customer profile attributes and ends with a decision on whether or not to promote that person. 
+Additional attributes deduced from the persons' OERs are not shown here as they are needed for fitting and scoring but theoretically not for pure prediction.
+The first step is to get rid of NaN values and introduce categorical variables for the gender attribute. In the second step, model 1 predicts an early viewing probability, which is used to sort out "lazy viewers".  To predict the final decision to send the offer, in step 3 we used model 2, which is fitted separately for each type of offer.
 \begin{figure}[H]
-\includegraphics[width=0.95\textwidth]{dataflow.png}
-\caption{Data flow showing a prediction  pipeline for the customer profile attributes  "gender", "age", "became\_member\_on", "income" to a "yes/no" prediction for an advertisement campaign. For each offer type a differently fitted version of model 2 is used. Models 1 and 2 were fitted using customer profile attributes and customers' offer event records (OERs).}
+\includegraphics[width=0.95\textwidth]{pics/dataflow.png}
+\caption{Data flow showing a prediction  pipeline for the customer profile attributes  "gender", "age", "became\_member\_on", "income" to a "Yes/No" prediction for an advertisement campaign. For each offer type a differently fitted version of model 2 is used. Models 1 and 2 were fitted using customer profile attributes and customers' offer event records (OERs).}
 \end{figure}
 
-\subsection{Step 1: data preparation}
-The customer profile data is first subjected to a NaN-value treatmet for the income.
+\subsection{\label{model step 1}Step 1: data preparation}
+The customer profile data is first subjected to a NaN value treatment for the income.
 In particular, customers who do not report an income, are marked as having an income of -10,000 dollars.
-Another issue treated in this step is the gender attribute which is categorical without order and therefore split into one-hot encoded attributes for each class label, resulting in "gender\_m", "gender\_f", "gender\_o",  and "gender\_nan" (indicating if no gender is provided).
+Another issue treated in this step is the gender attribute which is categorical without order and therefore split into one-hot encoded attributes for each class label, resulting in "gender\_M", "gender\_F", "gender\_O",  and "gender\_nan" (indicating if no gender is provided).
 
 
 
 
-\subsection{Step 2: model 1}
-Model 1 has the task of simplifying the value sets of the customers' integer features "age", "become\_member\_on" and "income" using a transformer to achieve 10 year steps for the "age", 1 year steps for "become\_member\_on" and 10,000 dollar steps for "income".
+\subsection{\label{model step 2}Step 2: model 1}
+Model 1 has the task of preventing overfitting and improving statistics by simplifying the value sets of the customers' integer features "age", "become\_member\_on" and "income" using a transformer to achieve 10 year steps for the "age", 1 year steps for "become\_member\_on" and 10,000 dollar steps for "income".
 Then, in a second transformation, a test-set customer receives, within the framework of model 1, an early viewing probability encoded in the attribute, "early\_viewing\_prob" (probability that the offer will be viewed within 48 h).
-This transformer also produces viewing preference information with the self-explanatory attributes "early\_viewing\_pref" and "late\_viewing\_pref"' to predict whether the customer prefers to view within 48 hours, prefers to view after 48 hours or does not tend to view at all.
-These attributes are not used as feature variables in subsequent steps of the pipeline, as they are only predicted from the demographic attributes, but are useful for supporting the visualisation of a customer's demographics in the results section.
+This transformer also produces viewing preference information with the self-explanatory attributes "early\_viewing\_pref" and "late\_viewing\_pref" to predict whether the customer prefers to view within 48 hours, prefers to view after 48 hours or does not tend to view at all.
+These two attributes are not actively used as feature variables in subsequent steps of the pipeline, as they are only predicted from the demographic attributes, but are useful for supporting the visualization of a customer's demographics in the results section.
 The underlying model of the second transformer is fitted with all the cleaned customer profile data from the profile training set, together with information about their OERs. The offer instances to be considered include only the customers' non-overlapping offer instances. This restriction was chosen because multi-offer effects can be quite complex and would be a further step of investigation that would likely require more data.
 
 
-\subsection{Step 3: model 2 (offer specific model)}
+\subsection{\label{model step 3}Step 3: model 2 (offer specific model)}
 
 In this step, an offer-specific model comes into play. Accordingly, a separate instance of this model is used for each offer type.
-The model itself uses cleansed customer profile data and all the customers' OERs of non-overlapping offer instances of the considered offer type and their corresponding no-offer OERs.
+The model itself uses cleaned customer profile data and all the customers' OERs of non-overlapping offer instances of the considered offer type and their corresponding no-offer OERs.
 The "offer completion" states for the no-offer instances are calculated in this model as if the customer had been promoted with the offer type considered in this model.
 To be precise, a difficulty had to be overcome that scales with the ratio between the no-offer and the offer duration.
 
@@ -241,14 +243,14 @@ Ideally, these customers will only have offers with states labelled I and IV, re
 This definition leads to the four different types of ideal customers shown in the figure below.
 \begin{figure}[H]
 \begin{center}
-\includegraphics[width=0.7\textwidth]{venn_diagram2.png}
+\includegraphics[width=0.7\textwidth]{pics/venn_diagram2.png}
 \caption{\label{fig:venn2}A Venn diagram is shown, representing a grouping of ideal customers into four disjunct sets filled with differently colored diagonal stripes. In each set there are only two different offer instance state labels (represented by Roman numbers). 
 }
 \end{center}
 \end{figure}
 
 Unfortunately, our customers are not ideal, so each customer will behave differently in relation to each individual offer instance.
-Therefore, the only way we can predict what behaviour the customer is most likely to reveal is by assuming a correlation between the customer's profile and the states of their offer instances.
+Therefore, the only way we can predict what behavior the customer is most likely to reveal is by assuming a correlation between the customer's profile and the states of their offer instances.
 
 In order to determine whether a customer will "complete the offer only if viewed", we create one predictor to distinguish between customer profiles with states labelled II vs. those with states labelled IV, and analogously a second to distinguish between I vs. III.
 Using their prediction probabilities for both label I and label IV customers, we can get a good estimate of the black-striped area. To do this, the threshold parameters $p_1$ and $p_2$ must be exceeded by both prediction probabilities.
@@ -258,12 +260,12 @@ However, some customers are actually discouraged from buying when they see an ad
 also included a third predictor (with threshold parameter $p_3$) that distinguishes between customer sets with labels I $\cup$ IV vs. II $\cup$ III. This allows separate tuning of the boundary between the orange and black striped area and the boundary between the orange and grey striped area. In addition, we have implemented a fourth threshold parameter $p_4$ for the early viewing probability determined in model 1 to weed out lazy viewers in the result set.
 This can prevent too many customers from being unknowingly rewarded.
 
-The threshold parameters are optimised on a hyperparameter grid for each model 2 instance using a 3-fold cross-validation procedure.
+The threshold parameters are optimized on a hyperparameter grid for each model 2 instance using a 3-fold cross-validation procedure with 1250 grid points.
 The scoring metrics for the validation sets and the test set used for every model 2 instance are defined below.
 
-\subsection{Scoring metric}
+\subsection{\label{Scoring metric}Scoring metric}
 The scoring metric was chosen to take into account two important aspects.
-Firstly, we want to maximise the number of customers who complete an offer when they receive it. The underlying metric to be maximised is the "incremental response rate" ("irr").
+Firstly, we want to maximize the number of customers who complete an offer when they receive it. The underlying metric to be maximized is the "incremental response rate" ("irr").
 On the other hand, we aim to gain consumption by maximising a shifted version of "net incremental revenue" ("nir").
 This prevents our recommendation algorithm from promoting too many customers whose rewards make them spend less because they are too satisfied.
 As a scoring metric, we therefore used a compromise that is a product of the two previous metrics, i.e.
@@ -289,9 +291,9 @@ n_{no\ prom,compl}:& \text{\ number of no-offer instances whose consumption rate
 \\
 n_{no\ prom}:& \text{\ number of no-offer instances}\nonumber
 \end{align}
-\text{\bf Shifted net incremental  revenew  "nir" (for offer type X):}
+\text{\bf Shifted net incremental  revenue  "nir" (for offer type X):}
 We take the sum of the consumption of completed offers (of offer type X) minus the sum of the consumption of no-offer instances whose consumption rate would satisfy an offer completion event of offer type X.
-Each consumption is normalised by its corresponding offer/no-offer duration. The function of the shift is to take care of the imbalanced data sets of completed offer instances vs. completed no-offer ones.
+Each consumption is normalized by its corresponding offer/no-offer duration. The function of the shift is to take care of the imbalanced data sets of completed offer instances vs. completed no-offer ones.
 \begin{align}
 nir=& \sum_{\substack{i \in \text{ "completed" offer}\\ \text{instances in}\\ \text{ test set}}} \frac{ \text{consumption(i) }}{ \text{duration(i) }} -   \sum_{\substack{k \in \text{ "completed" } \\ \text{no-offer instances  }\\ \text{in test set}}} \frac{  \text{consumption(k) }}{ \text{ duration(k) }}-\text{shift}\cdot  n_{\text{test}}
 \\
@@ -304,9 +306,81 @@ nir=& \sum_{\substack{i \in \text{ "completed" offer}\\ \text{instances in}\\ \t
  \sum_{\substack{i \in \text{ "completed" offer}\\ \text{instances in}\\ \text{ training set}}} \frac{ \text{consumption(i) }}{ \text{duration(i) }} -   \sum_{\substack{k \in \text{ "completed" } \\ \text{no-offer instances  }\\ \text{in training set}}} \frac{  \text{consumption(k) }}{ \text{ duration(k) }}  \right)    }\nonumber
 \end{align}
 
+\section{Implementation of the modeling approach}
+In this section we present the practical implementation of our modeling approach using examples of the data provided.
+Every important step in the data flow is described separately below.
+
+\subsection{Step 1: data preparation}
 
 
 
+First, the customer profile data is prepared by converting NaN values in the "income" field to -10,000 dollars and the "gender" attribute to one-hot encoded attributes, as described in \ref{model step 1} and shown in Fig.~\ref{implementation step1.1}.
+
+\begin{figure}[H]
+\centering
+  \includegraphics[width=0.8\textwidth]{pics/profile_cleaning.png}
+\caption{\label{implementation step1.1}Data cleaning of customer profile data is shown.}
+\end{figure}
+
+The provided transcript and portfolio data sets are then joined into the transcript unfolded portfolio dataframe ("df\_transcript\_unfolded\_portfolio"; see Fig.~\ref{implementation step1.2}).
+More specifically, the attribute "value" of the transcript dataframe, which is provided in terms of dictionary objects, is unfolded first and then augmented with information from the portfolio dataframe.
+
+\begin{figure}[H]
+   \centering
+  \includegraphics[width=1\textwidth]{pics/transcript_transformation.png}
+\caption{\label{implementation step1.2}The transformation of the original transcript (top left) and portfolio (center right) records into the "df\_transcript\_unfolded\_portfolio" dataframe is shown.}
+\end{figure}
+
+In the next step, the latter dataframe is transformed into a so-called main dataframe "df\_main" (see Fig.~\ref{implementation step1.3}) by several intermediate steps.
+All records with the key [person, offer\_id, offer\_received\_time] are now combined into one record.
+There is also always one entry per person containing aggregated information about the no-offer times.
+For records related to an offer type, the "promoted" variable is set to 1, otherwise 0 for no-offer instances.
+If the offer instance is viewed before it expires, it is marked with "viewed=1", otherwise with 0.
+Similarly, the new variable "completed" is set.
+The remaining new attributes "duration" and "consumption" represent the duration of the offer instance and the sum of all transactions made within its valid time interval.
+In addition to these data aggregations, there are also offer instances that have not been considered in the fitting and prediction.
+In particular, offers that overlap by more than one hour are removed, as we do not consider the influence of multiple offers on a customer.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.97 \textwidth]{pics/main_dataframe.png}
+\caption{\label{implementation step1.3}The main dataframe ("df\_main") is displayed, which is an aggregated version of the "df\_transcript\_unfolded\_portfolio" dataframe. }
+\end{figure}
+In a final step, the main dataframe is merged with the cleaned profile dataframe on the "person" attribute separately for train and test set customers (see Fig.~\ref{implementation step1.4}).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.97 \textwidth]{pics/main_dataframe_train.png}
+\caption{\label{implementation step1.4}The main dataframe with demographic attributes is shown for train set customers (name of dataframe is "df\_train"). For simplicity, not all columns are shown. The whole set of columns are: person, offer\_id, offer\_received\_time, offer\_viewed\_time, promoted, viewed, completed, duration, consumption, age, became\_member\_on, income, gender\_F, gender\_M, gender\_O, gender\_nan. }
+\end{figure}
+
+\subsection{Step 2: model 1}
+In model 1, the value sets of the demographic variables of "df\_train" and "df\_test" are simplified (\$10,000 steps for "income", 10 year steps for "age", annual steps for "become\_member\_on")
+using the "simplify\_fea\-ture\_values" transformer.
+The second transformer "add\_viewing\_pref\_features" adds viewing preference features.
+The whole model is a transformer pipeline and is shown in Fig.~\ref{implementation step2.1}.
+After fitting with "df\_train", the transformer pipeline produces the following new attributes as described in section~\ref{model step 2}: early\_viewing\_pref, late\_viewing\_pref, early\_viewing\_prob.
+
+\begin{figure}[H]
+\centering \includegraphics[width=0.35\textwidth]{pics/model1.png}
+\caption{\label{implementation step2.1}The composition of model 1 is shown, which consists of a transformer pipeline consisting of the transformers "simplify\_feature\_values" for reducing the value set of demographic attributes and "add\_viewing\_pref\_features" for predicting viewing preferences and an early viewing probability.}
+\end{figure}
+
+\subsection{Step 3: model 2}
+This offer-specific model is instantiated separately for each offer type.
+The entire model 2 is an estimator pipeline and optimized with a 3-fold cross-validation hyperparameter grid search (see Fig.~\ref{implementation step3.1}).
+In the first step, carried out using the "select\_specific\_offer\_and\_no\_offer" transformer, the outgoing dataframe of model 1 is taken and only the records related to the considered offer and all the no-offer records are filtered.
+Then the attribute "completion" is adjusted within the framework of the "adjust\_completion\_feature" transformer for the no-offer records and for all information offer instances as these have no completion records.
+Specifically, if a person has a higher hourly spend during an information offer instance than during a no-offer instance, then the information offer instance is marked as completed and vice versa.
+The last step consists in using the classifier "promotion\_classifier" to decide whether or not it is fruitful for the person to receive a promotion of this considered offer, by providing a vector of "Yes" or "No" entries.
+We would like to point out that the scoring on the evaluation sets within the framework of the cross-validation uses the same metric as the scoring in the test set (for details on the metric, see Sec.~\ref{Scoring metric}).
+With respect to the hyperparameter grid search for optimizing the model, we used for the threshold parameters $p_1,\dots, p_4$ (explained in Sec.~\ref{model step 3}) the following values: $p_1,\dots, p_3 \in (0, 0.25, 0.5, 0.75, 1)$ and for $p_4 \in (0,0.1,\dots,0.9)$.
+\begin{figure}[H]
+\centering \includegraphics[width=0.5\textwidth]{pics/model2.png}
+\caption{\label{implementation step3.1}The composition of model 2 is shown, which consists of a cross-validation hyperparameter search on an estimator pipeline.
+The latter consists of the transformers "select\_specific\_offer\_and\_no\_offer" and "adjust\_completion\_feature" and the classifier "promotion\_classifier".
+ }
+\end{figure}
 \section{Results}
 
 
@@ -323,13 +397,13 @@ Customers earning more than \$70,000 are slightly dominated by women. Those earn
 \end{figure}
 
 \subsection{Analyzing the promotion strategy for each offer type}
-In this subsection we briefly analyse, for each offer type (grouped by main offer types), which customers we would and would not recommend for a promotion using the strategy presented here.
+In this subsection we briefly analyze, for each offer type (grouped by main offer types), which customers we would and would not recommend for a promotion using the strategy presented here.
 Each figure represents the results of one offer type analysis and consists of three rows of graphs covering the demographic information of gender, income, age, membership begin year and viewing preference.
 The top row of graphs shows data for all customers and highlights the customers who should be promoted according to the strategy found.
 The middle row contains data only for customers to be promoted, while the bottom row contains data only for customers not to be promoted.
-The customer demographics in the corresponding histograms have been clustered in the five-dimensional space spanned by all the aforementioned demographic attributes. Clustering was performed separately for target and non-target customers. In each analysis, the values for the "irr" and "nir" metrics, the threshold parameters of model 2 ($p_1, p_2, p_3, p_4$), as well as the metric score and the target (non-target) to test set ratio or 'coverage' of all test set customers are shown.
+The customer demographics in the corresponding histograms have been clustered in the five-dimensional space spanned by all the aforementioned demographic attributes. Clustering was performed separately for target and non-target customers. In each analysis, the values for the "irr" and "nir" metrics, the threshold parameters of model 2 ($p_1, p_2, p_3, p_4$), as well as the metric score and the target (non-target) to test set ratio or "coverage" of all test set customers are shown.
 The values for the threshold parameters shown in this investigation, each multiplied by 100, refer to the percentile of the corresponding prediction probability values determined in the training set.
-The following hyperparameter grid was used for optimizing $p_1,\dots, p_4$: $p_1,\dots, p_3 \in (0, 0.25, 0.5, 0.75, 1)$ and for $p_4 \in (0,0.1,\dots,0.9)$.
+
 \subsubsection{Diagrams for BOGO offers}
 
 \begin{figure}[H]
@@ -394,7 +468,31 @@ With regard to the choice of demographic attributes for a possible promotion dec
 However, the impact of the "income" attribute, as well as the decision to provide demographic data at all, seems to be very profound in this context.
 There may also be a tendency for targeting via social networks to increase the metric score.
 
+\section{Discussion and outlook}
 
+There are several ways to improve this survey. 
+One simple way is to increase the sampling rate in the four-dimensional hyperparameter grid.
+This is particularly useful when hardware is available with a large number of computing cores, as each parameter setting can be computed in parallel. 
+So far, a hyperparameter grid of 1250 constellations has been used for the threshold parameters $p_1,\dots, p_4$. 
+
+We would also like to point out that a lot of data representing people under the influence of multiple offers have been removed. More data with single offer influence or a modeling approach to deal with multiple offer influence could be very helpful. 
+In this respect, from a scientific point of view, it is useful to carry out a large scale or finite size analysis to scrutinize the stability of the target group when the amount of data increases.
+
+In this research it is also not clear how customers behave depending on the order of the offers or the time between them. Even the frequency of spending may be characteristic but is not investigated here.
+The choice for the used metric is also an area for improvement. For example, the consumption of promoted customers who do not complete the offer, as well as non-promoted customers who would not have completed the offer, is not taken into account in terms of their consumption, only the number of these customers appears in the irr metric.
+
+Concerning our predictor model (model 2) there is also a possibility for improvement. In model 2, we have treated promoted and non-promoted customers together in the offer instances with state labels II and IV respectively (see table in Sec.~\ref{model step 3}). 
+In this sense, we group people who do not view the offer together with people who might view it. We can justify this approach due to its simplicity and the lack of data, as well as the fact that our ideal customer approach so far examines separately the event of viewing on consumption in model 2 and the viewing behavior in the framework of model 1.
+Accordingly, one could tackle this issue and build a classifier for model 2 that includes all six states of the offer instances, but this would increase the hyperparameter space and the need for data and powerful hardware.
+
+With respect to our results, we noticed that the membership start date in terms of years does not seem to be a characteristic demographic attribute.
+This annual date mapping was done for simplicity and to avoid overfitting.
+Perhaps a more fine-grained version that takes into account seasonal influences, for example, might lead to a more distinctive demographic characteristic.
+The time between signing up in the app and receiving the offer may also have an effect. For example, someone who has just signed up for the app might be very receptive to advertising.
+And of course, more demographic data, even if it is hard to get, seems to be helpful. But also other categories of data like employment or geographic data may improve the modeling approach. So if people live or work near a Starbucks café or store, they might go there more often and perhaps buy more if they receive ads, even if they are not belonging to the best target group within the current investigation.
+
+A final point of further investigation we would like to mention concerns the estimators used. In particular, we used throughout the "LogisticRegression"-estimator as regressors with a fixed setting for the regularization, number of iterations and so on.
+This is because it was used successfully on a simpler promotion problem formulated by Starbucks (see  Ref.~\cite{b}).
 
 
 \end{document}

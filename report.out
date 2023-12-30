@@ -3,15 +3,20 @@
 \BOOKMARK [1][-]{section.2}{Introduction}{}% 3
 \BOOKMARK [1][-]{section.3}{Definitions}{}% 4
 \BOOKMARK [1][-]{section.4}{Modeling approach}{}% 5
-\BOOKMARK [2][-]{subsection.4.1}{Data flow}{section.4}% 6
+\BOOKMARK [2][-]{subsection.4.1}{Data flow for new customers}{section.4}% 6
 \BOOKMARK [2][-]{subsection.4.2}{Step 1: data preparation}{section.4}% 7
 \BOOKMARK [2][-]{subsection.4.3}{Step 2: model 1}{section.4}% 8
 \BOOKMARK [2][-]{subsection.4.4}{Step 3: model 2 \(offer specific model\)}{section.4}% 9
 \BOOKMARK [2][-]{subsection.4.5}{Scoring metric}{section.4}% 10
-\BOOKMARK [1][-]{section.5}{Results}{}% 11
-\BOOKMARK [2][-]{subsection.5.1}{Cluster analysis for all customers in the test set}{section.5}% 12
-\BOOKMARK [2][-]{subsection.5.2}{Analyzing the promotion strategy for each offer type}{section.5}% 13
-\BOOKMARK [3][-]{subsubsection.5.2.1}{Diagrams for BOGO offers}{subsection.5.2}% 14
-\BOOKMARK [3][-]{subsubsection.5.2.2}{Diagrams for discount offers}{subsection.5.2}% 15
-\BOOKMARK [3][-]{subsubsection.5.2.3}{Diagrams for informational offers}{subsection.5.2}% 16
-\BOOKMARK [1][-]{section.6}{Conclusion}{}% 17
+\BOOKMARK [1][-]{section.5}{Implementation of the modeling approach}{}% 11
+\BOOKMARK [2][-]{subsection.5.1}{Step 1: data preparation}{section.5}% 12
+\BOOKMARK [2][-]{subsection.5.2}{Step 2: model 1}{section.5}% 13
+\BOOKMARK [2][-]{subsection.5.3}{Step 3: model 2}{section.5}% 14
+\BOOKMARK [1][-]{section.6}{Results}{}% 15
+\BOOKMARK [2][-]{subsection.6.1}{Cluster analysis for all customers in the test set}{section.6}% 16
+\BOOKMARK [2][-]{subsection.6.2}{Analyzing the promotion strategy for each offer type}{section.6}% 17
+\BOOKMARK [3][-]{subsubsection.6.2.1}{Diagrams for BOGO offers}{subsection.6.2}% 18
+\BOOKMARK [3][-]{subsubsection.6.2.2}{Diagrams for discount offers}{subsection.6.2}% 19
+\BOOKMARK [3][-]{subsubsection.6.2.3}{Diagrams for informational offers}{subsection.6.2}% 20
+\BOOKMARK [1][-]{section.7}{Conclusion}{}% 21
+\BOOKMARK [1][-]{section.8}{Discussion and outlook}{}% 22
